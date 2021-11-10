@@ -1,11 +1,10 @@
 #pragma once
 
-namespace Chapter2 
+namespace Chapter6
 {
     void Demo1();
     void Demo2();
     void Demo3();
-    void Demo3_Overflow();
     void Demo4();
     void Demo5();
     void Demo6();
