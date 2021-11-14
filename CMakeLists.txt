@@ -5,6 +5,7 @@ project(CPP_Basics)
 add_executable(CPP_Basics main.cpp 
     Chapter2/cpp_initiation.cpp
     Chapter2/cpp_initiation_2.cpp
+    Chapter2/data_types.cpp
     Chapter3/string_vector_array.cpp
     Chapter4/expressions.cpp
     Chapter5/statements.cpp
