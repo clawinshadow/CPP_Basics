@@ -2,5 +2,7 @@
 
 namespace Chapter2
 {
-    void DT_Demo1();
+    void StringEncodingDemo();
+    void SizeofDataTypesDemo();
+    void FloatPointSpecialValuesDemo();
 }

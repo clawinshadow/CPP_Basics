@@ -14,7 +14,9 @@ int main(int, char**) {
     //Chapter2::Demo2();
     //Chapter2::Demo3();
     //Chapter2::Demo3_Overflow();
-    Chapter2::DT_Demo1();
+    Chapter2::StringEncodingDemo();
+    Chapter2::SizeofDataTypesDemo();
+    Chapter2::FloatPointSpecialValuesDemo();
     //Chapter2::Demo4();
     //Chapter2::Demo5();
     //Chapter2::Demo6();
