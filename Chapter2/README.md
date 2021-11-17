@@ -191,4 +191,28 @@ C++算是一种类型不安全的语言(type unsafety)，在给算术类型赋�
       std::cout << "uc + c = " << uc + c << std::endl;
   }
   ```
-
+### 1.4 字面值 (Literals)
+字面值就是一个很直观的值(self-explaning)，常用于赋值表达式的右边，每一个字面值都有对应的数据类型，编译器根据它的值以及前后缀等形式来推断它的数据类型
+#### 1.4.1 整数字面值 (Integer literals)
+表示一个整数，对于整数字面值来说，编译器推断出来的数据类型至少都是`int`，不存在`short`这种字面值整数类型。所以下面的代码应该显示是4字节
+```C++
+auto i = 10;       //decimal-literal
+std::cout << "sizeof(i) = " << sizeof(i) << std::endl;
+```
+能在数值后面加上各种后缀来告知编译器这是一个`long int`，或者是`long long int`，或者是无符号类型等等
+```C++
+auto i_l = 10l;    // suffix l/L means signed long int
+std::cout << "sizeof(i_l) = " << sizeof(i_l) << std::endl;
+auto i_ll = 10LL;  // suffix LL/ll means signed long long int
+std::cout << "sizeof(i_LL) = " << sizeof(i_ll) << std::endl;
+auto i_u = -10u;   // suffix u means unsigned, -10 definitely overflow
+std::cout << "i_u = " << i_u << std::endl;
+```
+一个整数字面值支持四种进制的表示方法，二进制、八进制、十进制和十六进制
+```C++
+auto i_b = 0b1010; //binary-literal
+auto i_o = 012;    //octal-literal
+auto i_h = 0xA;    //hexademical-literal
+std::cout << "i i_b i_o i_h: " << i   << " " << i_b << " " 
+                               << i_o << " " << i_h << " " << std::endl;
+```

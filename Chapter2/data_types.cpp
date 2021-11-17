@@ -105,4 +105,25 @@ void FloatPointSpecialValuesDemo()
               << "isnan(strtod(\"NaN\")): " << std::isnan(std::strtod("NaN", &end)) << std::endl;
 }
 
+void LiteralsDemo()
+{
+    auto i = 10;       //decimal-literal
+    std::cout << "sizeof(i) = " << sizeof(i) << std::endl;
+
+    auto i_l = 10l;    // suffix l/L means signed long int
+    std::cout << "sizeof(i_l) = " << sizeof(i_l) << std::endl;
+    auto i_ll = 10LL;  // suffix LL/ll means signed long long int
+    std::cout << "sizeof(i_LL) = " << sizeof(i_ll) << std::endl;
+    auto i_u = -10u;   // suffix u means unsigned, -10 definitely overflow
+    std::cout << "i_u = " << i_u << std::endl;
+
+    auto i_b = 0b1010; //binary-literal
+    auto i_o = 012;    //octal-literal
+    auto i_h = 0xA;    //hexademical-literal
+    std::cout << "i i_b i_o i_h: " << i << " " 
+                                   << i_b << " " 
+                                   << i_o << " " 
+                                   << i_h << " " << std::endl;
+}
+
 }
