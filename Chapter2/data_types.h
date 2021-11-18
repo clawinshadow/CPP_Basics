@@ -6,5 +6,6 @@ namespace Chapter2
     void SizeofDataTypesDemo();
     void FloatPointSpecialValuesDemo();
     void LiteralsDemo();
-    void VariablesDeclarationDemo();
+
+    void ReferencesDemo();
 }

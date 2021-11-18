@@ -290,4 +290,38 @@ int a = 1, *p = nullptr, f(), (*pf)(double);
 // declarator (*pf)(double) defines a pointer to function
 //                  taking double and returning int
 ```
-性请参考[[Declarations]](https://en.cppreference.com/w/cpp/language/declarations)
+详情参考[[Declarations]](https://en.cppreference.com/w/cpp/language/declarations)
+
+----------
+## 2. 复合类型 (Compound types)
+本章主要介绍引用、指针以及数组等复合类型
+### 2.1 引用 (reference)
+引用就是给已存在的对象起的一个别名，它在内存中没有属于自己的实体数据，声明符形式: `&`_`var`_
+> A reference is not an object. Instead, a reference is just another name for an already existing object.
+
+引用类型的声明：
+```C++
+int i = 42;
+int &ref_i = i; //ref_i is a reference of i
+std::cout << "ref_i = " << ref_i << std::endl;
+```
+对引用的所有修改操作直接影响其绑定的对象
+```C++
+ref_i = 0;
+std::cout << "i = " << i << std::endl;
+```
+需要注意的几点：\
+1. 引用在声明的时候必须被初始化，不存在默认值
+   ```C++
+   int &ref_i2;    //compile error: reference must be initialized
+   ```
+2. 不能用字面值来初始化一个引用
+   ```C++
+   int &ref_i3 = 1024; //compiler error: reference cannot bind to a literal value
+   ```
+3. 声明引用的数据类型必须与其绑定的对象数据类型一致
+   ```C++
+   double d = 3.1415
+   int &ref_d = d; //compiler error: type of reference must be the same as the binding object
+   ```
+参考`ReferencesDemo()`;

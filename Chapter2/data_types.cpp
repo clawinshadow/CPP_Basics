@@ -145,10 +145,22 @@ void LiteralsDemo()
     std::cout << "sizeof(u32_c) = " << sizeof(u32_c) << std::endl;
 }
 
-void VariablesDeclarationDemo()
+void ReferencesDemo()
 {
-    //int 3i;  //ERROR: cannot begin with digits
-    int __i__;
+    int i = 42;
+    int &ref_i = i; //ref_i is a reference of i
+    std::cout << "ref_i = " << ref_i << std::endl;
+    
+    ref_i = 0;
+    std::cout << "i = " << i << std::endl;
+
+    // int &ref_i2;    //compile error: reference must be initialized
+
+    // int &ref_i3 = 1024; //compiler error: reference cannot bind to a literal value
+
+    // double d = 3.1415
+    // int &ref_d = d; //compiler error: type of reference must be the same as the binding object
+
 }
 
 }
