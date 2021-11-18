@@ -124,6 +124,31 @@ void LiteralsDemo()
                                    << i_b << " " 
                                    << i_o << " " 
                                    << i_h << " " << std::endl;
+
+    auto f = 3.14159f;  // suffix f/F represents a float type
+    std::cout << "sizeof(f) = " << sizeof(f) << std::endl;
+    auto d = 3.14159;   // no suffix represents a default double type
+    std::cout << "sizeof(d) = " << sizeof(d) << std::endl;
+    auto ld = 3.14159L; // suffix l/L represents a long double type
+    std::cout << "sizeof(ld) = " << sizeof(ld) << std::endl;
+
+    auto f_e = 3.14159e5; //科学计数法来表示一个浮点数, e/E 作为指数标记
+    std::cout << "f_e = " << f_e << std::endl;
+
+    auto c = 'a';       //default char type with no prefix
+    std::cout << "sizeof(c) = " << sizeof(c) << std::endl;
+    auto wide_c = L'a'; // L prefix represents a wide character, wchar_t
+    std::cout << "sizeof(wide_c) = " << sizeof(wide_c) << std::endl;
+    auto u16_c = u'a';  // u prefix represents a char16_t, utf-16 character
+    std::cout << "sizeof(u16_c) = " << sizeof(u16_c) << std::endl;
+    auto u32_c = U'a';  // U prefix represents a char32_t, utf-32 character
+    std::cout << "sizeof(u32_c) = " << sizeof(u32_c) << std::endl;
+}
+
+void VariablesDeclarationDemo()
+{
+    //int 3i;  //ERROR: cannot begin with digits
+    int __i__;
 }
 
 }

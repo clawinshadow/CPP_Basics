@@ -93,7 +93,9 @@ void SizeofDataTypesDemo()
 }
 ```
 ### 1.2 浮点数类型
-包括`float`, `double`,`long double`三种，一般`float`是32位，后面两者都是64位，在大多数平台上`long double`和`double`都是一样的精度。浮点数类型有三个特殊值要注意一下
+包括`float`, `double`,`long double`三种，一般`float`是32位，`double`是64位，`long double`是128位，但是在大多数平台上`long double`只使用了80位有效位数来描述一个浮点数，少数平台支持全部的128位超高精度浮点数。
+
+浮点数类型有三个特殊值要注意一下
 1. _带负号的零_ (Negative zero) - 算术上它与零相等，主要用于生成`-INFINITY`
 2. _INFINITY_ - 无穷大，分别有正无穷和负无穷
    - `INFINITY` 与所有数值的加减乘除均为INFINITY
@@ -216,3 +218,76 @@ auto i_h = 0xA;    //hexademical-literal
 std::cout << "i i_b i_o i_h: " << i   << " " << i_b << " " 
                                << i_o << " " << i_h << " " << std::endl;
 ```
+#### 1.4.2 浮点数字面值 (Floating-point literals)
+一个浮点数字面值的类型由下面几种后缀来决定：
+- (no suffix) defines a `double`
+- f/F defines a `float`
+- l/L defines a `long double`
+```C++
+auto f = 3.14159f;  // suffix f/F represents a float type
+std::cout << "sizeof(f) = " << sizeof(f) << std::endl;
+auto d = 3.14159;   // no suffix represents a default double type
+std::cout << "sizeof(d) = " << sizeof(d) << std::endl;
+auto ld = 3.14159L; // suffix l/L represents a long double type
+std::cout << "sizeof(ld) = " << sizeof(ld) << std::endl;
+```
+浮点数的科学计数法表示
+```C++
+auto f_e = 3.14159e5; //科学计数法来表示一个浮点数, e/E 作为指数标记
+std::cout << "f_e = " << f_e << std::endl;
+```
+#### 1.4.3 字符型、字符串字面值 (Character/String literals)
+字符型和字符串字面值采用相同的前缀来决定具体的数据类型
+- No prefix -> default `char` type, 1 byte
+- 'L' prefix -> defines a `wchar_t` type, 4 bytes
+- 'u' prefix -> defines a `char16_t` type, 2 bytes
+- 'U' prefix -> defines a `char32_t` type, 4 bytes 
+```C++
+auto c = 'a';       //default char type with no prefix
+std::cout << "sizeof(c) = " << sizeof(c) << std::endl;
+auto wide_c = L'a'; // L prefix represents a wide character, wchar_t
+std::cout << "sizeof(wide_c) = " << sizeof(wide_c) << std::endl;
+auto u16_c = u'a';  // u prefix represents a char16_t, utf-16 character
+std::cout << "sizeof(u16_c) = " << sizeof(u16_c) << std::endl;
+auto u32_c = U'a';  // U prefix represents a char32_t, utf-32 character
+std::cout << "sizeof(u32_c) = " << sizeof(u32_c) << std::endl;
+```
+字符串字面值的前缀一样，具体参考前面的StringsEncodingDemo
+
+### 1.5 变量的声明 (Variables declaration)
+变量的声明主要由两个部分组成: 
+- 修饰符序列(specifier sequence): 主要就是指明变量的数据类型、是否常量等等
+- 声明符序列(declarator list): 一个声明符由 变量名称(identifiers) 以及 引用符号`&`, 指针符号`*`...等组合而成
+
+>_decl-specifier-seq init-declarator-list_
+
+#### 1.5.1 修饰符(Specifier)
+主要就是指明变量的数据类型、是否常量等等
+1. 指明变量的数据类型 (type specifiers) - 前面提及的各类基本数据类型都是修饰符，包括`class`, `enum`, `struct`, `union`...等复杂数据类型
+2. `typedef`, `inline`, `friend`, `constexpr`等各类访问修饰符、常量表达式修饰符、其它各种特殊用途的修饰符等等
+   
+详情参考[[Specifiers]](https://en.cppreference.com/w/cpp/language/declarations)
+
+#### 1.5.2 标识符(Identifier)
+主要用于指定一个变量的名称，它由数字、拉丁字母、下划线组成，可任意排列但要注意以下几点
+1. 不能以数字开头，会导致编译失败 `(e.g. int 3i; //compile error)`
+2. 不能与任何C++关键字(keywords)重名，会导致编译失败
+3. 大小写敏感
+4. 以下几种命名方式编译能通过，但通常这类命名方式被标准库所保留(reserved)，容易重名
+    - 名称中不要出现连续两个下划线(`__`)，尤其是名称开头和结尾部分
+    - 名称不要以 下划线+大写字母 开头(`e.g. _A`)
+    - 全局变量的名称中不要以下划线开头
+
+#### 1.5.3 声明符(Declarator)
+一个声明符由变量标识符以及引用符号`&`/`&&`, 指针符号`*`...等组成，引用和指针与简单数据类型组合成复合类型(compound types)
+```C++
+int a = 1, *p = nullptr, f(), (*pf)(double);
+// decl-specifier-seq is int
+// declarator a = 1 defines and initializes a variable of type int
+// declarator *p = nullptr defines and initializes a variable of type int*
+// declarator (f)() declares (but doesn't define)
+//                  a function taking no arguments and returning int
+// declarator (*pf)(double) defines a pointer to function
+//                  taking double and returning int
+```
+性请参考[[Declarations]](https://en.cppreference.com/w/cpp/language/declarations)
