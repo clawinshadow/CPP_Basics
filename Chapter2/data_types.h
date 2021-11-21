@@ -8,4 +8,5 @@ namespace Chapter2
     void LiteralsDemo();
 
     void ReferencesDemo();
+    void PointersDemo();
 }

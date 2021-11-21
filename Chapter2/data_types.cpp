@@ -161,6 +161,26 @@ void ReferencesDemo()
     // double d = 3.1415
     // int &ref_d = d; //compiler error: type of reference must be the same as the binding object
 
+    int &ref_i4 = ref_i; //reference can be copied;
+    std::cout << "ref_i4 = " << ref_i4 << std::endl;
+
+    //int &&ref_ref_i = ref_i; //compile error: cannot define a reference refer to another reference
+}
+
+void PointersDemo()
+{
+    int val = 42;
+    int *p_val = &val; //get the memory address of val
+    std::cout << "The value of p_val point to: " << *p_val << std::endl; //dereference p_val
+
+    int i = 5;
+    int *pi = &i; //pointer declaration
+    std::cout << std::hex << "The value of pi (the address of i) = " << pi << std::endl;
+
+    int *p; //don't need to be initialized
+    std::cout << std::hex << "The value of uninitialized p: " << p << std::endl; //a random memory address
+    std::cout << "The value p point to: " << (int)*p << std::endl; //probably crashed here
+
 }
 
 }

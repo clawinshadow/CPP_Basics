@@ -310,18 +310,52 @@ std::cout << "ref_i = " << ref_i << std::endl;
 ref_i = 0;
 std::cout << "i = " << i << std::endl;
 ```
-需要注意的几点：\
+需要注意的几点：
 1. 引用在声明的时候必须被初始化，不存在默认值
    ```C++
    int &ref_i2;    //compile error: reference must be initialized
    ```
-2. 不能用字面值来初始化一个引用
+2. 引用在初始化之后，无法再绑定到其他的对象，没有这样的语法
+3. 引用只能绑定实体对象，不能绑定另一个引用，即：不存在引用的引用 
+4. 不能用字面值来初始化一个引用
    ```C++
    int &ref_i3 = 1024; //compiler error: reference cannot bind to a literal value
    ```
-3. 声明引用的数据类型必须与其绑定的对象数据类型一致
+5. 声明引用的数据类型必须与其绑定的对象数据类型一致
    ```C++
    double d = 3.1415
    int &ref_d = d; //compiler error: type of reference must be the same as the binding object
    ```
 参考`ReferencesDemo()`;
+### 2.2 指针(Pointer)
+__指针__ 是“指向”另外一种类型的复合类型，它的声明符形式`*var`，其中`var`是该指针变量的名称。
+- 它使用 __取地址符&__ 来获取目标对象的内存地址
+- 对指针使用 __解引用符* (dereference)__ 来获取目标对象的实体数据
+   ```C++
+   int val = 42;
+   int *p_val = &val; //get the memory address of val
+   std::cout << "The value of p_val point to: " << *p_val << std::endl; //dereference p_val
+   ```
+
+与引用类似，指针也实现了对其他对象的间接访问。但是它与引用还有很多不同之处：
+
+1. 引用本身在内存里没有对应的实体，它只是另外一个对象的别名。指针不同，它本身存储了指向另外一个对象的内存地址，在32位机器上是32位地址，64位机器上是64位地址。所以指针本身是有实体数据的。
+   ```C++
+   int i = 5;
+   int *pi = &i; //pointer declaration
+   std::cout << std::hex << "The value of pi (the address of i) = " << pi << std::endl;
+   ```
+   上面代码中的指针`pi`在64位机器上打印出来一般都是48位的值，是因为目前绝大多数CPU都只用了48位的地址空间(能应付2^18次方GB的内存)，高16位保留了。
+
+   Linux 系统可使用 `cat /proc/cpuinfo` 来查看CPU详细信息
+
+   MacOS 可使用 `sysctl -a | grep cpu` 来查看
+
+2. 指针无需在声明的时候赋初始值，未初始化的指针拥有一个不确定的值(Undefined behavior)，使用它时程序一般都会crash，但也有可能会继续错误的运行下去，需要尽量避免这种不可预计的后果
+   ```C++
+   int *p; //don't need to be initialized
+   std::cout << std::hex << "The value of uninitialized p: " << p << std::endl; //a random memory address
+   std::cout << "The value p point to: " << (int)*p << std::endl; //probably crashed here
+   ```
+   > __ATTENTION__: 初始化所有的指针
+3.  
