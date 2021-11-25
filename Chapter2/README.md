@@ -387,3 +387,6 @@ __指针__ 是“指向”另外一种类型的复合类型，它的声明符形
    p2 = &a;
    std::cout << std::boolalpha << "p1 == p2: " << (p1 == p2) << std::endl;
    ```
+
+#### const引用 (reference to a const)
+引用本身不是一个对象，所以这里的const不是用来修饰引用的，实际上它是一个针对const常量的引用
