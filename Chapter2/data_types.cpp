@@ -181,6 +181,25 @@ void PointersDemo()
     std::cout << std::hex << "The value of uninitialized p: " << p << std::endl; //a random memory address
     std::cout << "The value p point to: " << (int)*p << std::endl; //probably crashed here
 
+    int *p_null = 0;
+    p_null = NULL;
+    p_null = nullptr; // all the same to initialize a null pointer
+    if (!p_null)
+        std::cout << "p_null is a null pointer" << std::endl;
+
+    int i2 = 6;
+    pi = &i2;
+    std::cout << "now p2 point to i2: " << *pi << std::endl;
+
+    //references comparation
+    int *p1 = nullptr;
+    int *p2 = nullptr;
+    std::cout << std::boolalpha << "p1 == p2: " << (p1 == p2) << std::endl;
+
+    int a = 5;
+    p1 = &a;
+    p2 = &a;
+    std::cout << std::boolalpha << "p1 == p2: " << (p1 == p2) << std::endl;
 }
 
 }

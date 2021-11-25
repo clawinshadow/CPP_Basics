@@ -349,13 +349,41 @@ __指针__ 是“指向”另外一种类型的复合类型，它的声明符形
 
    Linux 系统可使用 `cat /proc/cpuinfo` 来查看CPU详细信息
 
-   MacOS 可使用 `sysctl -a | grep cpu` 来查看
-
 2. 指针无需在声明的时候赋初始值，未初始化的指针拥有一个不确定的值(Undefined behavior)，使用它时程序一般都会crash，但也有可能会继续错误的运行下去，需要尽量避免这种不可预计的后果
    ```C++
    int *p; //don't need to be initialized
    std::cout << std::hex << "The value of uninitialized p: " << p << std::endl; //a random memory address
    std::cout << "The value p point to: " << (int)*p << std::endl; //probably crashed here
    ```
-   > __ATTENTION__: 初始化所有的指针
-3.  
+   > __ATTENTION__: 初始化所有的指针，如果暂时不知道给指针赋什么值，可以用NULL或者0来初始化一个空指针，C++11之后可以用`nullptr`来初始化空指针
+
+   我们可以直接将指针作为if语句的判断条件，如果该指针为`nullptr`或者`0/NULL`这样的空指针，if 语句返回false，否则为true
+   ```C++
+   int *p_null = 0;
+   p_null = NULL;
+   p_null = nullptr; // all the same to initialize a null pointer
+   if (!p_null)
+      std::cout << "p_null is a null pointer" << std::endl;
+   ```
+   所以当我们使用一个来路不明的指针时，比如在一个函数体内使用作为参数传进来的指针，最好是先判断它是否为空指针，以免对它解引用时报错导致程序crash
+3. 引用在其初始化后就一直与初始对象绑定，但是指针在其生命周期内可以再指向不同的对象
+   ```C++
+   int i2 = 6;
+   pi = &i2;
+   std::cout << "now p2 point to i2: " << *pi << std::endl;
+   ```
+#### 指针之间的比较
+对于两个类型相同的合法指针，可以使用相等操作符`==`和不等操作符`!=`来比较它们。如果它们存放的地址值是相等的，则比较结果为true。地址值相等主要有以下三种情况：
+1. 两个指针都为空
+2. 两个指针指向同一个对象
+   ```C++
+   //references comparation
+   int *p1 = nullptr;
+   int *p2 = nullptr;
+   std::cout << std::boolalpha << "p1 == p2: " << (p1 == p2) << std::endl;
+
+   int a = 5;
+   p1 = &a;
+   p2 = &a;
+   std::cout << std::boolalpha << "p1 == p2: " << (p1 == p2) << std::endl;
+   ```
