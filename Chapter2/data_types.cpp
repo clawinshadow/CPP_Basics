@@ -202,4 +202,66 @@ void PointersDemo()
     std::cout << std::boolalpha << "p1 == p2: " << (p1 == p2) << std::endl;
 }
 
+int GetBufSize() { return 42; }
+
+void ConstDemo()
+{
+    const int BUF_SIZE = 42;
+    //BUF_SIZE = 42; //error: const object cannot be modified
+    std::cout << BUF_SIZE << std::endl;
+
+    const int BUF_SIZE2 = GetBufSize();
+    //const int BUF_SIZE3; //error: uninitialized const
+
+    int i = BUF_SIZE;
+    i = 0; //i can be modified after copy from the const BUF_SIZE
+    std::cout << "i = " << i << std::endl;
+    std::cout << "BUF_SIZE = " << BUF_SIZE << std::endl;
+
+    const int i2 = i;
+    //i2 = 42;//error: i2 cannot be modified
+}
+
+void ConstReferenceDemo()
+{
+    const int ci = 42;
+    const int &r1 = ci; //reference to const variable ci
+    //r1 = 0;       //error: cannot modify the value of a const reference
+    //int &r2 = ci; //error: non const reference to a const variable
+
+    int i = 42;
+    const int &r3 = i; //it's ok, const reference can be bind to a nonconst variable
+    //r3 = 0; //error: cannot modify i by its const reference
+}
+
+void ConstPointersDemo()
+{
+    //a plain pointer point to const object
+    const int i = 42;
+    //int *pi = &i; //error: nonconst pointer point to a const object
+    
+    const int *cpi = &i;
+    std::cout << "*cpi = " << *cpi << std::endl;
+    //*cpi = 0; //error: pi point to a const object
+    int j = 10;
+    cpi = &j; // it's ok, pointer itself can be changed
+    std::cout << "*cpi = " << *cpi << std::endl;
+
+    // a const pointer
+    int val = 42;
+    int *const pval = &val;
+    std::cout << "*pval = " << *pval << std::endl;
+    *pval = 1;
+    std::cout << "val = " << val << std::endl;
+    //pval = nullptr; //error: pointer itself cannot be changed
+
+    //int *const p; //error: must be initialized
+
+    //a const pointer point to a const object
+    const int k = 42;
+    const int *const ptr = &k;
+    //*ptr = 0;      // error
+    //ptr = nullptr; // error
+}
+
 }

@@ -388,5 +388,112 @@ __指针__ 是“指向”另外一种类型的复合类型，它的声明符形
    std::cout << std::boolalpha << "p1 == p2: " << (p1 == p2) << std::endl;
    ```
 
-#### const引用 (reference to a const)
+## 3. CV限定符(cv-qualifiers)
+cv是`const`/`volatile`这两个关键字的简称，这两个关键字一般用于修饰各种变量，会限定变量的很多行为，所以也称为限定符(qualifiers)
+### const限定符
+被const修饰的变量一般也称为常量，它具有如下特性:
+1. 常量不可被修改
+   
+   所有可能造成常量被修改的操作均会导致编译错误，典型的比如给常量赋值，即便赋一个一样的值也不行
+   ```C++
+   const int BUF_SIZE = 42;
+   BUF_SIZE = 42; //error: const object cannot be modified
+   ```
+2. 常量必须在声明时就被初始化、
+   
+   常量不会使用各种数据类型的默认值来初始化变量，必须显式的在声明时初始化常量。可以使用字面值、或者返回相同数据类型的函数来初始化常量　
+   ```C++
+   int GetBufSize() { return 42; }
+
+   const int BUF_SIZE = 42;
+   const int BUF_SIZE2 = GetBufSize();
+   ```
+3. 常量和非常量之间可以相互copy，只要数据类型一样. 
+   ```C++
+   int i = BUF_SIZE;
+   i = 0; //i can be modified after copy from the const BUF_SIZE
+   std::cout << "i = " << i << std::endl;
+   std::cout << "BUF_SIZE = " << BUF_SIZE << std::endl;
+
+   const int i2 = i;
+   i2 = 42;//error: i2 cannot be modified
+   ```
+### const引用 (reference to a const)
 引用本身不是一个对象，所以这里的const不是用来修饰引用的，实际上它是一个针对const常量的引用
+1. 与常量一样，常量的引用也不能被修改
+2. 可以将一个常量引用绑定到非常量的对象上，反之则不行。因为普通的对象同时具备读、写两种属性，常量引用绑定上去之后，通过这个引用我们只能读原始对象，限制了对原始对象的写操作，这是允许的。而如果将一个普通引用绑定到常量对象上，则通过引用可以对原始常量进行写操作，破坏了常量的定义。
+   ```C++
+   void ConstReferenceDemo()
+   {
+      const int ci = 42;
+      const int &r1 = ci; //reference to const variable ci
+      //r1 = 0;       //error: cannot modify the value of a const reference
+      //int &r2 = ci; //error: non const reference to a const variable
+
+      int i = 42;
+      const int &r3 = i; //it's ok, const reference can be bind to a nonconst variable
+      //r3 = 0; //error: cannot modify i by its const reference
+   }
+   ```
+### const与指针
+跟引用不同的是，指针本身就是一个对象。所以当const和指针组合在一起时，指针既能指向一个常量的对象，本身也可以是一个常量的指针，也可能两者兼具
+1. 指向一个常量对象的指针
+   - 指针本身需要使用const限定符来声明 `e.g. const int *p`
+      ```C++
+      //a plain pointer point to const object
+      const int i = 42;
+      //int *pi = &i; //error: nonconst pointer point to a const object
+      ```
+   - 与引用一样，声明之后不能再通过该指针去修改其指向的常量对象
+      ```C++
+      const int *cpi = &i;
+      std::cout << "*cpi = " << *cpi << std::endl;
+      //*cpi = 0; //error: pi point to a const object
+      ```
+   - 但是指针本身可以被修改，即可以指向另外的对象，即便这个新对象不是常量也行
+      ```C++
+      int j = 10;
+      cpi = &j; // it's ok, pointer itself can be changed
+      std::cout << "*cpi = " << *cpi << std::endl;
+      ```
+
+2. 一个常量指针 `e.g. int *const p`
+   - 指针本身即是常量，也就是这个地址不能再被修改
+   - 和所有常量对象一样，它必须在声明时即被初始化
+   - 可以通过该指针修改其指向对象的值
+      ```C++
+      // a const pointer
+      int val = 42;
+      int *const pval = &val;
+      std::cout << "*pval = " << *pval << std::endl;
+      *pval = 1;
+      std::cout << "val = " << val << std::endl;
+      //pval = nullptr; //error: pointer itself cannot be changed
+
+      //int *const p; //error: must be initialized
+      ```
+3. 指向常量对象的常量指针 `e.g. const int *const p`
+   ```C++
+   const int k = 42;
+   const int *const ptr = &k;
+   //*ptr = 0;      // error
+   //ptr = nullptr; // error
+   ```
+__Concepts__
+
+可以看到在复合类型中如果再加上const限定符，会显得很混乱，所以C++引入了两个概念来帮助阅读这种复杂的声明
+1. Top-level const(顶层const): 顶层const表示它所修饰的这个变量自身是一个常量
+   > Top-level const indicates that an object itself is const
+   ```C++
+   int i = 0;
+   int *const p1 = &i;  // we can't change the value of p1; const is top-level
+   const int ci = 42;   // we cannot change ci; const is top-level
+   const int *const p2 = &i; // The second const is top-level
+   ```
+2. Low-level const(底层const): 相应的，底层const表示它修饰的变量所指向的对象是个常量
+   > When a pointer can point to a const object, we refer to that const as a low-level const
+   ```C++
+   int i = 0;
+   const int *p = &i; //low-level const, p point to a const 
+   const int &r = i;  //const reference is always a low-level const
+   ```
