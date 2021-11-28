@@ -388,9 +388,19 @@ __指针__ 是“指向”另外一种类型的复合类型，它的声明符形
    std::cout << std::boolalpha << "p1 == p2: " << (p1 == p2) << std::endl;
    ```
 
+#### 对指针的引用
+指针本身是一个对象，所以也存在对指针的引用。但这种声明有时候不太容易读懂，比如下面例子中的`rp3`变量是对指针`p3`的引用，形如`int *&rp3 = p3;`，对于这种形式的复合类型声明，我们遵循从右到左的顺序去阅读，首先是`&`符号，说明`rp3`变量是个引用，其次是`*`符号，说明`rp3`所绑定的对象是一个指针。
+```C++
+//reference to a pointer
+int b = 1;
+int *p3 = &b;
+int *&rp3 = p3; //read from right to left
+std::cout << "*rp3 = " << *rp3 << std::endl;
+```
+
 ## 3. CV限定符(cv-qualifiers)
 cv是`const`/`volatile`这两个关键字的简称，这两个关键字一般用于修饰各种变量，会限定变量的很多行为，所以也称为限定符(qualifiers)
-### const限定符
+### 3.1 const限定符
 被const修饰的变量一般也称为常量，它具有如下特性:
 1. 常量不可被修改
    
@@ -418,7 +428,7 @@ cv是`const`/`volatile`这两个关键字的简称，这两个关键字一般用
    const int i2 = i;
    i2 = 42;//error: i2 cannot be modified
    ```
-### const引用 (reference to a const)
+### 3.2 const引用 (reference to a const)
 引用本身不是一个对象，所以这里的const不是用来修饰引用的，实际上它是一个针对const常量的引用
 1. 与常量一样，常量的引用也不能被修改
 2. 可以将一个常量引用绑定到非常量的对象上，反之则不行。因为普通的对象同时具备读、写两种属性，常量引用绑定上去之后，通过这个引用我们只能读原始对象，限制了对原始对象的写操作，这是允许的。而如果将一个普通引用绑定到常量对象上，则通过引用可以对原始常量进行写操作，破坏了常量的定义。
@@ -435,7 +445,7 @@ cv是`const`/`volatile`这两个关键字的简称，这两个关键字一般用
       //r3 = 0; //error: cannot modify i by its const reference
    }
    ```
-### const与指针
+### 3.3 const与指针
 跟引用不同的是，指针本身就是一个对象。所以当const和指针组合在一起时，指针既能指向一个常量的对象，本身也可以是一个常量的指针，也可能两者兼具
 1. 指向一个常量对象的指针
    - 指针本身需要使用const限定符来声明 `e.g. const int *p`
@@ -482,7 +492,7 @@ cv是`const`/`volatile`这两个关键字的简称，这两个关键字一般用
 __Concepts__
 
 可以看到在复合类型中如果再加上const限定符，会显得很混乱，所以C++引入了两个概念来帮助阅读这种复杂的声明
-1. Top-level const(顶层const): 顶层const表示它所修饰的这个变量自身是一个常量
+1. __Top-level__ const(顶层const): 顶层const表示它所修饰的这个变量自身是一个常量
    > Top-level const indicates that an object itself is const
    ```C++
    int i = 0;
@@ -490,10 +500,103 @@ __Concepts__
    const int ci = 42;   // we cannot change ci; const is top-level
    const int *const p2 = &i; // The second const is top-level
    ```
-2. Low-level const(底层const): 相应的，底层const表示它修饰的变量所指向的对象是个常量
+2. __Low-level__ const(底层const): 相应的，底层const表示它修饰的变量所指向的对象是个常量
    > When a pointer can point to a const object, we refer to that const as a low-level const
    ```C++
    int i = 0;
    const int *p = &i; //low-level const, p point to a const 
    const int &r = i;  //const reference is always a low-level const
    ```
+------
+### 3.4 `constexpr`关键字 与 常量表达式(constant expressions)
+#### 3.4.1 常量表达式 (constant expressions)
+常量表达式的值可以在编译时被计算出来。这类表达式可以用于设定数组长度、字段的位长度(bit-field length)等类似的一切需要常量表达式的上下文。e.g. 
+```C++
+int n = 1;
+std::array<int, n> a1;  // error: n is not a constant expression
+const int cn = 2;
+std::array<int, cn> a2; // OK: cn is a constant expression
+```
+下面代码中的staff_size不是常量表达式，是因为它是一个普通int型，在编译时不会对普通变量的值进行计算，即便是代码里面我们给他赋了一个字面值27，但是这个赋值操作也只会发生在运行时；
+
+sz不是常量表达式，是因为get_size()方法没有用`constexpr`关键字来修饰返回值，编译时同样无法获得sz的具体值
+```C++
+const int max_files = 20;        // max_files is a constant expression 
+const int limit = max_files + 1; // limit is a constant expression 
+
+int staff_size = 27;             // staff_size is not a constant expression 
+const int sz = get_size();       // sz is not a constant expression
+```
+
+------
+
+关于常量表达式的严格定义非常复杂，可以参考[[C++ constant expressions]](https://en.cppreference.com/w/cpp/language/constant_expression). \
+简而言之，我们需要记住常量表达式的核心是：让编译器在编译时就能计算出这些值，从而将这个具体的数值替换源代码中所有这个名字出现过的地方，在最终生成的机器代码中，将不会再有该变量的名字，只有编译时计算出来的这个数值。从而在某种程度上提升程序在运行时的效率，并节省一定的内存空间
+#### 3.4.2 `constexpr`关键字
+C++ 11之后引入`constexpr`关键字，主要用于更方便的构建常量表达式。它们所修饰的对象，其值在编译时已经确定
+> `constexpr` - specifies that the value of a variable or function can appear in constant expressions
+
+- 和`const`一样，`constexpr`修饰的变量也是一个常量，不允许任何代码修改
+- 与`const`不一样的地方，`constexpr`除了修饰变量之外，还能用于函数、以及类的构造函数等，表明这个函数的返回值在编译时可以确定，以及这个类可以在常量表达式中被初始化
+
+通俗点说，如果你要在一个常量表达式中引入别的变量、函数或者类，那么这些变量、函数或者类必须都得用`constexpr`来修饰. e.g. 
+```C++
+constexpr int GetSize() {return 1; }
+
+void ConstexprDemo()
+{
+    constexpr int mf = 20;         // 20 is a constant expression 
+    constexpr int limit = mf + 1;  // mf + 1 is a constant expression 
+    constexpr int sz2 = GetSize(); // ok only if size is a constexpr function
+}
+```
+C++14之后，为了避免`constexpr`的滥用，为它的使用范围做了限定，他只能用于修饰特定类型的变量、函数等，具体可以参考 [[C++ constexpr specifier]](https://en.cppreference.com/w/cpp/language/constexpr)
+
+需要注意的是`constexpr`用于修饰引用或者指针时，其所绑定、指向的对象，他们的地址必须在编译时就能确定，意味着它们都是全局变量 e.g.
+```C++
+int i = 0;
+void ConstexprDemo()
+{
+   ...
+   constexpr int &ri = i;  //it's ok, i is a global variable
+   int j = 0;
+   constexpr int &rj = j;  //error: j is a local variable
+}
+```
+另外：一个constexpr修饰的指针表示这个指针本身是个常量，比如下面例子中的`constexpr int *pi`，某种意义它等于`int *const pi`而不是`const int *p`
+```C++
+int i = 0;
+void ConstexprDemo()
+{
+   ...
+   constexpr int *pi = &i; // it's ok, the address of i is fixed at compile time.
+   pi = nullptr; //error: pi is a const pointer cannot be changed anymore
+}
+```
+
+### 3.5 `volatile`限定符
+volatile本意是“易变的”，C++里面如果用volatile来修饰一个变量，用意在于提醒编译器它后面所定义的变量随时都有可能改变，因此编译后的程序每次需要存储或读取这个变量的时候，都会直接从`变量地址`中读取数据。
+
+如果没有volatile关键字，则编译器可能优化读取和存储：比如将这个变量从内存里copy到CPU寄存器中，以便后续能高效的访问，如果后面这个变量在内存里由别的程序更新了的话，代码就会出现错误
+
+e.g.
+```C++
+volatile int *foo = 0x7ffc3e03fcd; //some_memory_mapped_device
+while (*foo)
+    ; // wait until *foo turns false
+```
+比如上面的例子中，`foo`可能是某个内存地址映射的硬件设备，后面的while循环持续监听这个地址，等待某个外部程序将这个地址置为零后，程序才能中断运行。
+
+如果没有加入volatile限定符，那么经过编译器优化之后，程序可能会将`0x7ffc3e03fcd`这个原始地址直接存入CPU寄存器，之后即便外部程序修改了foo的地址，while循环里面去读取该变量的时候，依然是从CPU寄存器里读取的，会导致程序延迟中断。
+
+这个限定符的官方解释比较复杂[[cv qualifiers]](https://en.cppreference.com/w/cpp/language/cv)
+
+一般我们只需要明白几个tips即可
+- 在signal handler里面如果要操作某个变量，最好使用 volatile 限定符 [[e.g. std::signal]](https://en.cppreference.com/w/cpp/utility/program/signal)
+- 在某些线程之间需要切换上下文时，要用到volatile变量 [[e.g. setjmp]](https://en.cppreference.com/w/cpp/utility/program/setjmp)
+- 需要直接操作硬件时，为了避免编译器优化某个变量的读取，需要使用volatile变量
+
+除了上述几个情况，基本没有volatile限定符的用武之地，不要滥用
+
+--------
+## 4. 对象的生命周期、连接

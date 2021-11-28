@@ -191,7 +191,7 @@ void PointersDemo()
     pi = &i2;
     std::cout << "now p2 point to i2: " << *pi << std::endl;
 
-    //references comparation
+    //pointers comparation
     int *p1 = nullptr;
     int *p2 = nullptr;
     std::cout << std::boolalpha << "p1 == p2: " << (p1 == p2) << std::endl;
@@ -200,6 +200,12 @@ void PointersDemo()
     p1 = &a;
     p2 = &a;
     std::cout << std::boolalpha << "p1 == p2: " << (p1 == p2) << std::endl;
+
+    //reference to a pointer
+    int b = 1;
+    int *p3 = &b;
+    int *&rp3 = p3; //read from right to left
+    std::cout << "*rp3 = " << *rp3 << std::endl;
 }
 
 int GetBufSize() { return 42; }
@@ -262,6 +268,33 @@ void ConstPointersDemo()
     const int *const ptr = &k;
     //*ptr = 0;      // error
     //ptr = nullptr; // error
+}
+
+int get_size() { return 1; }
+
+void ConstExpressionsDemo()
+{
+    const int max_files = 20;        // max_files is a constant expression 
+    const int limit = max_files + 1; // limit is a constant expression 
+    int staff_size = 27;             // staff_size is not a constant expression 
+    const int sz = get_size();       // sz is not a constant expression
+}
+
+constexpr int GetSize() {return 1; }
+
+int i = 0;
+void ConstexprDemo()
+{
+    constexpr int mf = 20;         // 20 is a constant expression 
+    constexpr int limit = mf + 1;  // mf + 1 is a constant expression 
+    constexpr int sz2 = GetSize(); // ok only if size is a constexpr function
+
+    constexpr int &ri = i;  //it's ok, i is a global variable
+    int j = 0;
+    //constexpr int &rj = j;  //error: j is a local variable
+
+    constexpr int *pi = &i; // it's ok, the address of i is fixed at compile time.
+    //pi = nullptr; //error: pi is a const pointer cannot be changed anymore
 }
 
 }

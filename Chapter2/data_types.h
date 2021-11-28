@@ -13,4 +13,7 @@ namespace Chapter2
     void ConstDemo();
     void ConstReferenceDemo();
     void ConstPointersDemo();
+
+    void ConstExpressionsDemo();
+    void ConstexprDemo();
 }
