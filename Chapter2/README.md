@@ -223,6 +223,7 @@ std::cout << "i i_b i_o i_h: " << i   << " " << i_b << " "
 - (no suffix) defines a `double`
 - f/F defines a `float`
 - l/L defines a `long double`
+
 ```C++
 auto f = 3.14159f;  // suffix f/F represents a float type
 std::cout << "sizeof(f) = " << sizeof(f) << std::endl;
@@ -232,6 +233,7 @@ auto ld = 3.14159L; // suffix l/L represents a long double type
 std::cout << "sizeof(ld) = " << sizeof(ld) << std::endl;
 ```
 浮点数的科学计数法表示
+
 ```C++
 auto f_e = 3.14159e5; //科学计数法来表示一个浮点数, e/E 作为指数标记
 std::cout << "f_e = " << f_e << std::endl;
@@ -242,6 +244,7 @@ std::cout << "f_e = " << f_e << std::endl;
 - 'L' prefix -> defines a `wchar_t` type, 4 bytes
 - 'u' prefix -> defines a `char16_t` type, 2 bytes
 - 'U' prefix -> defines a `char32_t` type, 4 bytes 
+
 ```C++
 auto c = 'a';       //default char type with no prefix
 std::cout << "sizeof(c) = " << sizeof(c) << std::endl;
@@ -312,16 +315,19 @@ std::cout << "i = " << i << std::endl;
 ```
 需要注意的几点：
 1. 引用在声明的时候必须被初始化，不存在默认值
+
    ```C++
    int &ref_i2;    //compile error: reference must be initialized
    ```
 2. 引用在初始化之后，无法再绑定到其他的对象，没有这样的语法
 3. 引用只能绑定实体对象，不能绑定另一个引用，即：不存在引用的引用 
 4. 不能用字面值来初始化一个引用
+
    ```C++
    int &ref_i3 = 1024; //compiler error: reference cannot bind to a literal value
    ```
 5. 声明引用的数据类型必须与其绑定的对象数据类型一致
+
    ```C++
    double d = 3.1415
    int &ref_d = d; //compiler error: type of reference must be the same as the binding object
@@ -331,6 +337,7 @@ std::cout << "i = " << i << std::endl;
 __指针__ 是“指向”另外一种类型的复合类型，它的声明符形式`*var`，其中`var`是该指针变量的名称。
 - 它使用 __取地址符&__ 来获取目标对象的内存地址
 - 对指针使用 __解引用符* (dereference)__ 来获取目标对象的实体数据
+
    ```C++
    int val = 42;
    int *p_val = &val; //get the memory address of val
@@ -340,6 +347,7 @@ __指针__ 是“指向”另外一种类型的复合类型，它的声明符形
 与引用类似，指针也实现了对其他对象的间接访问。但是它与引用还有很多不同之处：
 
 1. 引用本身在内存里没有对应的实体，它只是另外一个对象的别名。指针不同，它本身存储了指向另外一个对象的内存地址，在32位机器上是32位地址，64位机器上是64位地址。所以指针本身是有实体数据的。
+
    ```C++
    int i = 5;
    int *pi = &i; //pointer declaration
@@ -350,6 +358,7 @@ __指针__ 是“指向”另外一种类型的复合类型，它的声明符形
    Linux 系统可使用 `cat /proc/cpuinfo` 来查看CPU详细信息
 
 2. 指针无需在声明的时候赋初始值，未初始化的指针拥有一个不确定的值(Undefined behavior)，使用它时程序一般都会crash，但也有可能会继续错误的运行下去，需要尽量避免这种不可预计的后果
+
    ```C++
    int *p; //don't need to be initialized
    std::cout << std::hex << "The value of uninitialized p: " << p << std::endl; //a random memory address
@@ -358,6 +367,7 @@ __指针__ 是“指向”另外一种类型的复合类型，它的声明符形
    > __ATTENTION__: 初始化所有的指针，如果暂时不知道给指针赋什么值，可以用NULL或者0来初始化一个空指针，C++11之后可以用`nullptr`来初始化空指针
 
    我们可以直接将指针作为if语句的判断条件，如果该指针为`nullptr`或者`0/NULL`这样的空指针，if 语句返回false，否则为true
+   
    ```C++
    int *p_null = 0;
    p_null = NULL;
@@ -367,15 +377,32 @@ __指针__ 是“指向”另外一种类型的复合类型，它的声明符形
    ```
    所以当我们使用一个来路不明的指针时，比如在一个函数体内使用作为参数传进来的指针，最好是先判断它是否为空指针，以免对它解引用时报错导致程序crash
 3. 引用在其初始化后就一直与初始对象绑定，但是指针在其生命周期内可以再指向不同的对象
+
    ```C++
    int i2 = 6;
    pi = &i2;
    std::cout << "now p2 point to i2: " << *pi << std::endl;
    ```
+   
+4. void * 指针
+   
+   void* 指针相当于一种泛型指针，可以将任何类型的指针赋给一个void×类型的指针变量，它能指向任何类型的对象。只是在解引用的时候需要先转化成对应的数据类型才能使用
+   
+   ```C++
+   void VoidPointersDemo()
+   {
+       //void pointers
+       double d = 3.14159;
+       double *pd = &d;
+       void *vp = pd;
+       std::cout << "*vp = " << *(double *)vp << std::endl;
+   }
+   ```
 #### 指针之间的比较
 对于两个类型相同的合法指针，可以使用相等操作符`==`和不等操作符`!=`来比较它们。如果它们存放的地址值是相等的，则比较结果为true。地址值相等主要有以下三种情况：
 1. 两个指针都为空
 2. 两个指针指向同一个对象
+
    ```C++
    //references comparation
    int *p1 = nullptr;
@@ -390,6 +417,7 @@ __指针__ 是“指向”另外一种类型的复合类型，它的声明符形
 
 #### 对指针的引用
 指针本身是一个对象，所以也存在对指针的引用。但这种声明有时候不太容易读懂，比如下面例子中的`rp3`变量是对指针`p3`的引用，形如`int *&rp3 = p3;`，对于这种形式的复合类型声明，我们遵循从右到左的顺序去阅读，首先是`&`符号，说明`rp3`变量是个引用，其次是`*`符号，说明`rp3`所绑定的对象是一个指针。
+
 ```C++
 //reference to a pointer
 int b = 1;
@@ -405,13 +433,15 @@ cv是`const`/`volatile`这两个关键字的简称，这两个关键字一般用
 1. 常量不可被修改
    
    所有可能造成常量被修改的操作均会导致编译错误，典型的比如给常量赋值，即便赋一个一样的值也不行
+   
    ```C++
    const int BUF_SIZE = 42;
    BUF_SIZE = 42; //error: const object cannot be modified
    ```
 2. 常量必须在声明时就被初始化、
    
-   常量不会使用各种数据类型的默认值来初始化变量，必须显式的在声明时初始化常量。可以使用字面值、或者返回相同数据类型的函数来初始化常量　
+   常量不会使用各种数据类型的默认值来初始化变量，必须显式的在声明时初始化常量。可以使用字面值、或者返回相同数据类型的函数来初始化常量
+   
    ```C++
    int GetBufSize() { return 42; }
 
@@ -419,6 +449,7 @@ cv是`const`/`volatile`这两个关键字的简称，这两个关键字一般用
    const int BUF_SIZE2 = GetBufSize();
    ```
 3. 常量和非常量之间可以相互copy，只要数据类型一样. 
+
    ```C++
    int i = BUF_SIZE;
    i = 0; //i can be modified after copy from the const BUF_SIZE
@@ -432,6 +463,7 @@ cv是`const`/`volatile`这两个关键字的简称，这两个关键字一般用
 引用本身不是一个对象，所以这里的const不是用来修饰引用的，实际上它是一个针对const常量的引用
 1. 与常量一样，常量的引用也不能被修改
 2. 可以将一个常量引用绑定到非常量的对象上，反之则不行。因为普通的对象同时具备读、写两种属性，常量引用绑定上去之后，通过这个引用我们只能读原始对象，限制了对原始对象的写操作，这是允许的。而如果将一个普通引用绑定到常量对象上，则通过引用可以对原始常量进行写操作，破坏了常量的定义。
+   
    ```C++
    void ConstReferenceDemo()
    {
@@ -449,18 +481,21 @@ cv是`const`/`volatile`这两个关键字的简称，这两个关键字一般用
 跟引用不同的是，指针本身就是一个对象。所以当const和指针组合在一起时，指针既能指向一个常量的对象，本身也可以是一个常量的指针，也可能两者兼具
 1. 指向一个常量对象的指针
    - 指针本身需要使用const限定符来声明 `e.g. const int *p`
+      
       ```C++
       //a plain pointer point to const object
       const int i = 42;
       //int *pi = &i; //error: nonconst pointer point to a const object
       ```
    - 与引用一样，声明之后不能再通过该指针去修改其指向的常量对象
+      
       ```C++
       const int *cpi = &i;
       std::cout << "*cpi = " << *cpi << std::endl;
       //*cpi = 0; //error: pi point to a const object
       ```
    - 但是指针本身可以被修改，即可以指向另外的对象，即便这个新对象不是常量也行
+      
       ```C++
       int j = 10;
       cpi = &j; // it's ok, pointer itself can be changed
@@ -471,6 +506,7 @@ cv是`const`/`volatile`这两个关键字的简称，这两个关键字一般用
    - 指针本身即是常量，也就是这个地址不能再被修改
    - 和所有常量对象一样，它必须在声明时即被初始化
    - 可以通过该指针修改其指向对象的值
+     
       ```C++
       // a const pointer
       int val = 42;
@@ -483,7 +519,8 @@ cv是`const`/`volatile`这两个关键字的简称，这两个关键字一般用
       //int *const p; //error: must be initialized
       ```
 3. 指向常量对象的常量指针 `e.g. const int *const p`
-   ```C++
+   
+    ```C++
    const int k = 42;
    const int *const ptr = &k;
    //*ptr = 0;      // error
@@ -494,6 +531,7 @@ __Concepts__
 可以看到在复合类型中如果再加上const限定符，会显得很混乱，所以C++引入了两个概念来帮助阅读这种复杂的声明
 1. __Top-level__ const(顶层const): 顶层const表示它所修饰的这个变量自身是一个常量
    > Top-level const indicates that an object itself is const
+   
    ```C++
    int i = 0;
    int *const p1 = &i;  // we can't change the value of p1; const is top-level
@@ -502,6 +540,7 @@ __Concepts__
    ```
 2. __Low-level__ const(底层const): 相应的，底层const表示它修饰的变量所指向的对象是个常量
    > When a pointer can point to a const object, we refer to that const as a low-level const
+   
    ```C++
    int i = 0;
    const int *p = &i; //low-level const, p point to a const 
@@ -511,6 +550,7 @@ __Concepts__
 ### 3.4 `constexpr`关键字 与 常量表达式(constant expressions)
 #### 3.4.1 常量表达式 (constant expressions)
 常量表达式的值可以在编译时被计算出来。这类表达式可以用于设定数组长度、字段的位长度(bit-field length)等类似的一切需要常量表达式的上下文。e.g. 
+
 ```C++
 int n = 1;
 std::array<int, n> a1;  // error: n is not a constant expression
@@ -520,6 +560,7 @@ std::array<int, cn> a2; // OK: cn is a constant expression
 下面代码中的staff_size不是常量表达式，是因为它是一个普通int型，在编译时不会对普通变量的值进行计算，即便是代码里面我们给他赋了一个字面值27，但是这个赋值操作也只会发生在运行时；
 
 sz不是常量表达式，是因为get_size()方法没有用`constexpr`关键字来修饰返回值，编译时同样无法获得sz的具体值
+
 ```C++
 const int max_files = 20;        // max_files is a constant expression 
 const int limit = max_files + 1; // limit is a constant expression 
@@ -540,6 +581,7 @@ C++ 11之后引入`constexpr`关键字，主要用于更方便的构建常量表
 - 与`const`不一样的地方，`constexpr`除了修饰变量之外，还能用于函数、以及类的构造函数等，表明这个函数的返回值在编译时可以确定，以及这个类可以在常量表达式中被初始化
 
 通俗点说，如果你要在一个常量表达式中引入别的变量、函数或者类，那么这些变量、函数或者类必须都得用`constexpr`来修饰. e.g. 
+
 ```C++
 constexpr int GetSize() {return 1; }
 
@@ -553,6 +595,7 @@ void ConstexprDemo()
 C++14之后，为了避免`constexpr`的滥用，为它的使用范围做了限定，他只能用于修饰特定类型的变量、函数等，具体可以参考 [[C++ constexpr specifier]](https://en.cppreference.com/w/cpp/language/constexpr)
 
 需要注意的是`constexpr`用于修饰引用或者指针时，其所绑定、指向的对象，他们的地址必须在编译时就能确定，意味着它们都是全局变量 e.g.
+
 ```C++
 int i = 0;
 void ConstexprDemo()
@@ -564,6 +607,7 @@ void ConstexprDemo()
 }
 ```
 另外：一个constexpr修饰的指针表示这个指针本身是个常量，比如下面例子中的`constexpr int *pi`，某种意义它等于`int *const pi`而不是`const int *p`
+
 ```C++
 int i = 0;
 void ConstexprDemo()
@@ -580,6 +624,7 @@ volatile本意是“易变的”，C++里面如果用volatile来修饰一个变�
 如果没有volatile关键字，则编译器可能优化读取和存储：比如将这个变量从内存里copy到CPU寄存器中，以便后续能高效的访问，如果后面这个变量在内存里由别的程序更新了的话，代码就会出现错误
 
 e.g.
+
 ```C++
 volatile int *foo = 0x7ffc3e03fcd; //some_memory_mapped_device
 while (*foo)

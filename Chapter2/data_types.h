@@ -9,6 +9,7 @@ namespace Chapter2
 
     void ReferencesDemo();
     void PointersDemo();
+    void VoidPointersDemo();
 
     void ConstDemo();
     void ConstReferenceDemo();

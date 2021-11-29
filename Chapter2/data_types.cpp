@@ -208,6 +208,15 @@ void PointersDemo()
     std::cout << "*rp3 = " << *rp3 << std::endl;
 }
 
+void VoidPointersDemo()
+{
+    //void pointers
+    double d = 3.14159;
+    double *pd = &d;
+    void *vp = pd;
+    std::cout << "*vp = " << *(double *)vp << std::endl;
+}
+
 int GetBufSize() { return 42; }
 
 void ConstDemo()

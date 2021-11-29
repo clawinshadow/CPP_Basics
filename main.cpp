@@ -20,10 +20,11 @@ int main(int, char**) {
     //Chapter2::LiteralsDemo();
     //Chapter2::ReferencesDemo();
     //Chapter2::PointersDemo();
+    Chapter2::VoidPointersDemo();
     //Chapter2::ConstDemo();
     //Chapter2::ConstPointersDemo();
-    Chapter2::ConstExpressionsDemo();
-    Chapter2::ConstexprDemo();
+    //Chapter2::ConstExpressionsDemo();
+    //Chapter2::ConstexprDemo();
     //Chapter2::Demo4();
     //Chapter2::Demo5();
     //Chapter2::Demo6();
