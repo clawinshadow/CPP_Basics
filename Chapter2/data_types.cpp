@@ -306,4 +306,27 @@ void ConstexprDemo()
     //pi = nullptr; //error: pi is a const pointer cannot be changed anymore
 }
 
+void BlockScopesDemo()
+{
+    {
+        int i = 0; // scope of outer i begins
+        ++i;       // outer i is in scope
+        {
+            int i = 1; // scope of inner i begins,
+                       // scope of outer i pauses
+            i = 42;    // inner i is in scope
+            std::cout << "inner i = " << i << std::endl;
+        } // block ends, scope of inner i ends,
+          // scope of outer i resumes
+        std::cout << "outer i = " << i << std::endl;
+    } // block ends, scope of outer i ends 
+
+    //Function scope
+    goto label;
+    std::cout << "This line will be passed" << std::endl;
+
+label:
+    std::cout << "jump to label" << std::endl;
+}
+
 }

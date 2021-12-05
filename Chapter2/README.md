@@ -644,4 +644,239 @@ while (*foo)
 除了上述几个情况，基本没有volatile限定符的用武之地，不要滥用
 
 --------
-## 4. 对象的生命周期、连接
+## 作用域 (Scopes)
+C++程序中的每一个名字(变量名、函数名..等)都有对应的作用域，只有在此作用域内的其它代码才能使用这个名字。
+> Each name that appears in a C++ program is only __visible__ in some possibly discontiguous portion of the source code called its __scope__.
+
+主要包含以下几种
+1. 块作用域 (Block Scopes)
+   - 局部作用域(local scope)
+   - 语句作用域(statement scope)
+2. 函数作用域 (Function Scopes)
+3. 命名空间作用域 (Namespace Scopes)
+   - 全局作用域 (File scope or Global scope)
+4. 类作用域 (Class scope)
+### 块作用域 (Block Scopes)
+一个block即是一组顺序执行的代码，首尾由大括号`{ ... }`包围。在block里面声明的名字，其作用域自它被声明时开始，到block结束的地方而结束。如果有多层嵌套的blocks中存在同名的名字，那么每个名字的作用域都只是当前所在的block。
+```C++
+void BlockScopesDemo()
+{
+    {
+        int i = 0; // scope of outer i begins
+        ++i;       // outer i is in scope
+        {
+            int i = 1; // scope of inner i begins,
+                       // scope of outer i pauses
+            i = 42;    // inner i is in scope
+            std::cout << "inner i = " << i << std::endl;
+        } // block ends, scope of inner i ends,
+          // scope of outer i resumes
+        std::cout << "outer i = " << i << std::endl;
+    } // block ends, scope of outer i ends 
+}
+```
+
+上面的例子就是典型的局部变量的作用域(Local Scopes)，除此之外，还有一些控制语句、异常处理里面声明的名字，它们的作用域依然属于Block Scopes
+### 异常处理
+异常处理即`catch (...) {...}`语句中所声明的名字，其作用域自它被声明时开始，到catch block结束的地方而结束. 多个catch语句的作用域彼此独立
+```C++
+try {
+   f();
+} catch (const std::runtime_error& re) { // scope of re begins
+   int n = 1;                   // scope of n begins
+   std::cout << n << re.what(); // re is in scope
+} // scope of re ends, scope of n ends
+catch (std::exception& e) {
+// std::cout << re.what(); // error: re is not in scope
+// ++n;                    // error: n is not in scope
+}
+```
+### 语句作用域 (Statement Scopes)
+if，for，while，switch等循环或控制语句中所声明的名字，其作用域自它被声明时开始，到语句block结束的地方而结束
+```C++
+Base* bp = new Derived;
+if (Derived* dp = dynamic_cast<Derived*>(bp)) {
+   dp->f(); // dp is in scope
+} // scope of dp ends
+ 
+for (int n = 0; n < 10; ++n // scope of n begins
+{
+   std::cout << n << ' ';  // n is in scope
+} // scope of n ends
+```
+
+## 函数作用域(Function Scopes)
+主要包含两种作用域
+1. 对于函数签名中的参数来说，它们的作用域自被声明时开始，存在于整个函数的block中
+2. 对于函数中的goto语句来说，后面对应的label名字，它的作用域自函数block的第一句代码开始，而非在声明时才开始，然后存在于整个函数的block之中
+   ```C++
+      //Function scope
+      goto label;
+      std::cout << "This line will be passed" << std::endl;
+
+   label:
+      std::cout << "jump to label" << std::endl;
+   ```
+## 命名空间作用域 (Namespace Scopes)
+在命名空间`namespace`里面声明的名字，其作用域自被声明时开始，存在于该namespace的所有代码里面，即便分散在不同的代码文件里面也行。
+
+C++里其实没有严格的全局变量的定义，通常我们认为的全局变量，它其实只是在当前代码文件(translation unit)的作用域里，所以也被称为file scope 或者是 global scope，而当前代码文件的作用域，本质上也是一个namespace scope。对于scope这个概念来说，不存在整个程序所有代码文件都能共享的一个“全局”作用域，如果某个变量需要被别的代码文件使用，那需要用到一些`linkage`的概念，后面再详述
+```C++
+int cnt = 1;
+
+void GlobalScopeDemo()
+{
+    int cnt = 2;
+    std::cout << "local cnt = " << cnt << std::endl;
+    std::cout << "global cnt = " << ::cnt << std::endl;
+}
+```
+上面的例子中，函数外面定义的cnt变量，可以用代码文件默认的顶层namespace来访问，它是个空字符串 `::cnt`
+## 类作用域 (Class scope)
+一个类里面声明的名字，其作用域自被声明时开始，存在于所有类的剩余定义、子类的定义、成员函数的实现等等
+其中比较特殊的是关于枚举类型的作用域，枚举有以下两种写法，它们的作用域不同
+```C++
+enum e1_t { // unscoped enumeration
+    A,
+    B = A * 2 // A is in scope
+}; // scopes of A and B continue
+ 
+enum class e2_t { // scoped enumeration
+    SA,
+    SB = SA * 2 // SA is in scope
+}; // scopes of SA and SB end
+ 
+e1_t e1 = B; // OK: B is in scope
+//e2_t e2 = SB; // error: SB is not in scope
+e2_t e2 = e2_t::SB; // OK
+```
+以前的枚举声明都是unscoped enumeration, 它的成员的作用域覆盖至整个namespace。但是C++11之后支持`enum class`的写法，对应scoped enumeration, 它的成员的作用域只限定在该枚举定义里面。所以外部访问必须加上枚举的类型名称再使用`::`符号(scope resolution operator)
+### TIPS: 关于作用域解析运算符`::`(scope resolution operator)
+假如一个名字中包含作用域解析运算符`::`，以`A::B`为例。实际上它描述了一个名字的层次关系
+- `::`符号右边的名字称为限定名(Qualified name), 它有可能是一个：
+  - 类的成员(静态或非静态的函数、子类型、模版等)
+  - 某个命名空间的成员（或者是嵌套的子命名空间）
+  - 枚举类型成员
+- `::`符号左边的名字称为非限定名(Unqualified name), 编译器会按照一定的优先级遍历代码，直到找到这个名字对应的定义为止。比如所有类型的定义、所有namespace的名字、所有枚举、模板等
+
+详见[[Unqualified name lookup]](https://en.cppreference.com/w/cpp/language/unqualified_lookup)
+-------
+## 对象的生命周期、连接
+一个名字的数据类型决定了它在内存中的二进制数据格式，它的作用域(Scopes)决定在编译时它在不同代码块中的可见性。除此之外一个名字还有两个独立的属性：它在运行时的存储期限(storage duration)、以及编译器在链接整个程序时它的连接关系(linkage)
+
+### C++中对象的四种存储期
+C++语言中的任何对象都对应如下四种存储期限(storage duration)之一，所谓存储期限其实也就是变量的生命周期。何时创建，何时释放。
+1. __automatic__ storage duration.
+   
+   它们的存储空间在包含他们的block开始的地方被创建，block结束的时候释放。所有的局部对象都在此之列，除非被声明为static, extern, 或者 thread_local
+   ```C++
+   void func()
+   {     // allocated storage for local object: i
+      ...
+      ...
+      int i = 1; //scope of i begins
+      ...
+   }     // deallocate i ; scope of i ends
+   ```
+2. __static__ storage duration.
+   
+   - 进程级的生命周期，程序启动时即被创建，结束时被释放。程序进入main函数之前，这些对象就已经初始化完毕
+   - 整个进程中只存在该对象的一个实例
+   - 所有namespace scope里面声明的对象都对应static storage duration，不管有没有用static或者extern来修饰
+   - 所有该类对象如果没有被显式的赋值，编译器都会默认采用全零来初始化(zero-initialization), 像block中声明的数组、指针如果未经初始化就使用会造成undefined behavior，但是static storage duration的数组和指针声明后即可被正常使用。
+3. __thread__ storage duration.
+   
+   - 线程级的生命周期，该线程启动时创建，结束时被释放。线程的主函数开始执行之前，这些对象就已经初始化完毕
+   - 每个线程都有一个该对象的实例
+   - 有专门的关键字`thread_local`来修饰对象，表明该对象属于这种存储期
+
+4. __dynamic__ storage duration.
+   
+   - 对象的创建和释放，由代码来动态的控制
+   - 典型的比如`new`和`delete`来动态的创建&释放一个对象、以及智能指针的使用
+   - 所有动态内存分配的函数，参考[[dynamic memory allocation]](https://en.cppreference.com/w/cpp/memory)
+
+### 连接(Linkage)
+一个项目里面可能有多个相同的名字，这些隶属于不同作用域的名字是否指向同一个实体对象，由它的连接属性来决定。
+
+为什么C++要弄出来一个连接属性(linkage)的概念，跟它的编译过程有关系，一个C++程序的生成需要经历三个阶段：预处理、编译和链接 (Preprocessing, compilation & linking)
+
+- 一个C++程序通常由多个编译单元组成(translation units), 每个编译单元由一个实现文件(implementation file)以及它include进来的所有头文件组成。
+- 实现文件的扩展名通常是`.cpp, .cxx, .cc`等，头文件的扩展名通常是`.h, .hpp, .hh`等
+- 每个编译单元在编译阶段都是独立编译的
+- 所有的编译单元都编译成功后，由链接器(linker)来将各个编译后的编译单元融合到一起形成一个整体的程序。
+- 在这个链接过程中，不同的编译单元可能有多个相同的名字，一个名字可以有多次声明但只能有一个定义(definition)，否则会造成linking error，程序生成失败。每个名字的连接属性决定了在链接过程中它的适用范围，主要有两种连接属性：内部连接(internal linkage) 和 外部连接 (external linkage)。
+
+Linkage这个概念主要是给namespace scope里的全局变量使用的，块作用域里的名字比如一个函数实现里面的局部变量不具备连接属性(no linkage)。
+1. __Internal Linkage__ - 链接过程中这个名字仅适用于所属的编译单元
+   
+   比如下面的例子中，两个不同的实现文件中均有`val`这个名字，但因为`static`标识符的存在，这两个名字的链接属性都是内连，仅在各自的编译单元中生效。所以在最终的程序中，虽然这两个名字不同，但其实它们都对应不同的实体对象。
+   ```C++
+   //file1.cpp
+   static int val = 1; //internal linkage
+   void LinkageDemo_File1()
+   {
+      std::cout << "val in file1 = " << val << std::endl;
+   }
+   ...
+   //file2.cpp
+   static int val = 2; //internal linkage
+
+   void LinkageDemo_File2()
+   {
+      std::cout << "val in file2 = " << val << std::endl;
+   }
+   ```
+   以下对象具备internal linkage的属性：
+   - __const__ objects
+   - __constexpr__ objects
+   - __typedef__ objects
+   - __static__ objects in namespace scope
+
+   e.g.
+   ```C++
+   //file1.cpp
+   static int val = 1;       //internal linkage
+   static int get_size() { return 1; } //internal linkage
+   const int cval = 1;       //internal linkage
+   constexpr int ce_val = 1; //internal linkage
+   typedef struct {int a; int b;} TS, *PTS; //internal linkage
+
+   //file2.cpp
+   static int val = 2;       //internal linkage
+   static int get_size() { return 2; } //internal linkage
+   const int cval = 2;       //internal linkage
+   constexpr int ce_val = 2; //internal linkage
+   typedef struct { char a; char b; } TS, *PTS; //internal linkage 
+   ```
+2. __External Linkage__ - 链接过程中这个名字适用于所有的编译单元，所以如果有两个相同的名字都具备外部链接属性，则会造成 linking error 
+
+   以下对象具备external linkage的属性
+   - __non-const__ & __non-static__ variables, __non-static__ functions, any variables declared __extern__
+   - __enumerations__
+   - __classes__, their member functions, static members..
+
+   比如下面例子中，_file1.cpp_中的全局变量`i`就具备外部连接的属性，所以其它文件中就不能再重复定义相同的名字，否则会造成链接失败。
+   ```C++
+   //file1.cpp
+   int i = 1;          //external linkage
+
+   //file2.cpp
+   int i = 2;          //linking error: duplicate symbol '_i'
+   ```
+   如果我们想在其它编译单元中共享变量`i`, 那么需要在别的编译单元中使用`extern`关键字来声明`i`，这样就会提示linker在链接的时候去别的编译单元寻找变量`i`的定义, 对于const常量的共享也一样
+   
+   e.g.
+   ```C++
+   //file2.cpp
+   extern int i;         //use extern to declare i, but not define it
+   extern const int ci;
+   
+   void LinkageDemo_File2()
+   {
+      ...
+
+      std::cout << "extern int i = " << i << std::endl;
+      std::cout << "extern const int ci = " << ci << std::endl;
+   }
+   ```

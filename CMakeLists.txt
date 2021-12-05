@@ -6,6 +6,8 @@ add_executable(CPP_Basics main.cpp
     Chapter2/cpp_initiation.cpp
     Chapter2/cpp_initiation_2.cpp
     Chapter2/data_types.cpp
+    Chapter2/scopes_linkage/file1.cpp
+    Chapter2/scopes_linkage/file2.cpp
     Chapter3/string_vector_array.cpp
     Chapter4/expressions.cpp
     Chapter5/statements.cpp

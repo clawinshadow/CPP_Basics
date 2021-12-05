@@ -1,6 +1,9 @@
 #include <iostream>
 #include "Chapter2/cpp_initiation.h"
 #include "Chapter2/data_types.h"
+#include "Chapter2/scopes_linkage/file1.h"
+#include "Chapter2/scopes_linkage/file2.h"
+
 #include "Chapter3/string_vector_array.h"
 #include "Chapter4/expressions.h"
 #include "Chapter5/statements.h"
@@ -20,11 +23,15 @@ int main(int, char**) {
     //Chapter2::LiteralsDemo();
     //Chapter2::ReferencesDemo();
     //Chapter2::PointersDemo();
-    Chapter2::VoidPointersDemo();
+    //Chapter2::VoidPointersDemo();
     //Chapter2::ConstDemo();
     //Chapter2::ConstPointersDemo();
     //Chapter2::ConstExpressionsDemo();
     //Chapter2::ConstexprDemo();
+    //Chapter2::BlockScopesDemo();
+    //GlobalScopeDemo();
+    LinkageDemo_File1();
+    LinkageDemo_File2();
     //Chapter2::Demo4();
     //Chapter2::Demo5();
     //Chapter2::Demo6();

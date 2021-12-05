@@ -17,4 +17,6 @@ namespace Chapter2
 
     void ConstExpressionsDemo();
     void ConstexprDemo();
+
+    void BlockScopesDemo();
 }
