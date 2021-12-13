@@ -644,6 +644,35 @@ while (*foo)
 除了上述几个情况，基本没有volatile限定符的用武之地，不要滥用
 
 --------
+## 4. 数组(Array)
+数组也是一种复合类型，它的长度固定，用于存储一组相同数据类型的对象，只能存储实体对象不能存储引用，声明符`a[d]` - 
+`d`表示该数组的长度，严格来说是数组的维度(dimension), 它必须在编译时即被确定，所以`d`只能用常量表达式来初始化
+```C++
+//declare an array
+int arr[10];
+int *ptrArray[10]; //array of 10 pointers
+
+constexpr int sz = 8;
+int arr2[sz]; //it's ok
+
+unsigned cnt = 5;
+int arr3[cnt]; //error: cnt is not a constant expression
+```
+需要注意的是，即便是像上面的demo中arr3使用非常量表达式来声明数组的长度，对某些编译器比如gcc来说也是不会报错的，gcc对这种代码做了编译扩展(compiler extension), 会更宽容一些
+
+可以使用`-pedantic`选项来让编译器报警，或者使用98的C++标准`-std=c++98`来让编译失败
+
+数组声明之后必须被初始化，访问未经初始化的数组元素时会造成undefined behavior, 返回一个随机值
+```C++
+//DO NOT access the array elements before initialization, undefined behavior
+std::cout << "arr3[3] = " << arr3[3] << std::endl;
+```
+但假如这个数组变量是全局变量，那么它的所有元素会被初始化为零
+
+### 4.1 数组初始化
+数组初始化有很多种方式，如下：
+- memset: C风格的初始化方式，将整个数组地址空间内的每一个字节清零
+--------
 ## 作用域 (Scopes)
 C++程序中的每一个名字(变量名、函数名..等)都有对应的作用域，只有在此作用域内的其它代码才能使用这个名字。
 > Each name that appears in a C++ program is only __visible__ in some possibly discontiguous portion of the source code called its __scope__.

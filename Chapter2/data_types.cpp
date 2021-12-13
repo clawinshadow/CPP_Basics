@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <cstring>
 
 #include <climits>
 #include <limits>
@@ -304,6 +305,38 @@ void ConstexprDemo()
 
     constexpr int *pi = &i; // it's ok, the address of i is fixed at compile time.
     //pi = nullptr; //error: pi is a const pointer cannot be changed anymore
+}
+
+int g_arr[5];
+void ArrayInitializingDemo()
+{
+    //declare an array
+    int arr[10];
+    int *ptrArray[10]; //array of 10 pointers
+
+    constexpr int sz = 8;
+    int arr2[sz]; //it's ok
+
+    unsigned cnt = 5;
+    int arr3[cnt]; //error: cnt is not a constant expression
+
+    //DO NOT access the array elements before initialization, undefined behavior
+    std::cout << "arr3[3] = " << arr3[3] << std::endl;
+    //but it's ok for global arrays, they were initialized with default values
+    std::cout << "g_arr[3] = " << g_arr[3] << std::endl;
+
+    //initialize an array
+    int arr4[5];
+    memset(arr4, 0, sizeof(arr4)); //C style
+    std::cout << "arr4[1] = " << arr4[1] << std::endl;
+    for (int i = 0; i < 5; ++i)
+        arr4[i] = 0;
+
+    int a1[3] = {0, 1, 2};          // array of three ints with values 0, 1, 2
+    int a2[] = {0, 1, 2};           // an array of dimension 3
+    int a3[5] = {0, 1, 2};          // equivalent to a3[] = {0, 1, 2, 0, 0}
+    std::string a4[3] = {"hi", "bye"}; // same as a4[] =  {"hi", "bye", ""}
+    //int a5[2] = {0, 1, 2};          // error: too many initializers
 }
 
 void BlockScopesDemo()

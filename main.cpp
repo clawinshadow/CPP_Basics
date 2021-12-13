@@ -28,6 +28,7 @@ int main(int, char**) {
     //Chapter2::ConstPointersDemo();
     //Chapter2::ConstExpressionsDemo();
     //Chapter2::ConstexprDemo();
+    Chapter2::ArrayInitializingDemo();
     //Chapter2::BlockScopesDemo();
     //GlobalScopeDemo();
     LinkageDemo_File1();
